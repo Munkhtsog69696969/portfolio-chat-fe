@@ -128,7 +128,6 @@ export default function Page() {
         senderId: user._id,
         _id: `temp-${Date.now()}`,
         timestamp: new Date().toISOString(),
-        timeStamp: Date.now()
       };
 
       socket.emit("send-server-message", {
@@ -172,7 +171,7 @@ export default function Page() {
           const chatPosition = message.senderId === user?._id ? "end" : "start";
           const chatType = message.senderId === user?._id ? "primary" : "accent";
           return (
-            <div key={message._id || `message-${i}`} className={`chat chat-${chatPosition} text-white`}>
+            <div key={message._id || `message-${i}`} className={`chat chat-${chatPosition && chatPosition} text-white`}>
               <div className="chat-header flex flex-row items-center">
                 <p className='text-sm'>{message?.senderName}</p>
                 <time className="text-xs opacity-50 ml-2">
@@ -181,7 +180,7 @@ export default function Page() {
                     : 'N/A'}
                 </time>
               </div>
-              <div className={`chat-bubble chat-bubble-${chatType}`}>
+              <div className={`chat-bubble chat-bubble-${chatType && chatType}`}>
                 {message.message}
               </div>
             </div>

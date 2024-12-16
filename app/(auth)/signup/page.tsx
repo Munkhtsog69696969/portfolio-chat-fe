@@ -30,7 +30,7 @@ export default function Signup() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${process.env.SERVER_ADDRESS}/signup`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -18,7 +18,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (!accessToken) return
 
-    const socketInstance:any = io(process.env.SERVER_ADDRESS, {
+    const socketInstance:any = io(process.env.NEXT_PUBLIC_SERVER_ADDRESS, {
         auth: {
           token: accessToken
         }

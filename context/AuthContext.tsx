@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const refreshAccessToken = async () => {
     try {
       console.log('Attempting to refresh access token');
-      const response = await axios.post(`${process.env.SERVER_ADDRESS}/refresh_token`, {}, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/refresh_token`, {}, {
         withCredentials: true
       });
 
@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (userData: { email: string, password: string }) => {
     try {
-      const response = await axios.post(`${process.env.SERVER_ADDRESS}/signin`, userData, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/signin`, userData, {
         withCredentials: true
       });
 
@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setAccessToken(null);
 
     try {
-      const response = await axios.post(`${process.env.SERVER_ADDRESS}/logout`, {}, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/logout`, {}, {
         withCredentials: true
       });
 

@@ -29,7 +29,7 @@ const ServerContext = createContext<ServerContextType | undefined>(undefined);
 
 const createAxiosInstance = (token: string) => {
   return axios.create({
-    baseURL: process.env.SERVER_ADDRESS,
+    baseURL: process.env.NEXT_PUBLIC_SERVER_ADDRESS,
     headers: {
       Authorization: `Bearer ${token}`,
     },

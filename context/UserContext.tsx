@@ -58,7 +58,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }
 
       const axiosInstance = axios.create({
-        baseURL: process.env.SERVER_ADDRESS,
+        baseURL: process.env.NEXT_PUBLIC_SERVER_ADDRESS,
         headers: {
           Authorization: `Bearer ${currentToken}`
         }
@@ -102,7 +102,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }
   
       const axiosInstance = axios.create({
-        baseURL: process.env.SERVER_ADDRESS,
+        baseURL: process.env.NEXT_PUBLIC_SERVER_ADDRESS,
         headers: {
           Authorization: `Bearer ${currentToken}`
         }
@@ -131,7 +131,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }
 
       const axiosInstance = axios.create({
-        baseURL: process.env.SERVER_ADDRESS,
+        baseURL: process.env.NEXT_PUBLIC_SERVER_ADDRESS,
         headers: {
           Authorization: `Bearer ${currentToken}`
         }
@@ -174,7 +174,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }
   
       const axiosInstance = axios.create({
-        baseURL: process.env.SERVER_ADDRESS,
+        baseURL: process.env.NEXT_PUBLIC_SERVER_ADDRESS,
         headers: {
           Authorization: `Bearer ${currentToken}`
         }

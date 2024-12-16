@@ -18,7 +18,7 @@ export default function Resend_confirmation_mail() {
     setMessage('');
 
     try {
-      const response = await fetch(`${process.env.SERVER_ADDRESS}/resend_confirmation`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/resend_confirmation`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
