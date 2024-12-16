@@ -6,6 +6,7 @@ import { useUser } from '@/context/UserContext';
 import { useSocket } from '@/context/SocketContext';
 
 interface Friend {
+  _id:string
   name: string;
   email: string;
 }
@@ -33,17 +34,19 @@ const FriendList: React.FC = () => {
       setOnlineFriends(friends);
       
       if (user.friends) {
-        const currentOfflineFriends = user.friends
-          .filter(friend => 
-            // Ensure friend has a name and is not in online friends
-            friend.name && !friends.some(onlineFriend => onlineFriend.email === friend.email)
-          )
-          .map(friend => ({
-            name: friend.name!, // Use non-null assertion since we filtered for name
-            email: friend.email
-          }));
+              const currentOfflineFriends = user.friends
+        .filter(friend => 
+          // Ensure friend has a name and is not in online friends
+          friend.name && !friends.some(onlineFriend => onlineFriend.email === friend.email)
+        )
+        .map(friend => ({
+          _id: friend._id, // Include _id here
+          name: friend.name!, // Use non-null assertion since we filtered for name
+          email: friend.email
+        }));
 
-        setOfflineFriends(currentOfflineFriends);
+      setOfflineFriends(currentOfflineFriends);
+
       }
     });
 
@@ -95,7 +98,7 @@ const FriendList: React.FC = () => {
               key={`online-${i}`} 
               className='bg-[rgb(26,26,26)] w-full h-15 rounded-xl flex items-center p-2 mb-2'
               onClick={() => navigateToUser({
-                _id: onlineFriend.email, // Using email as a fallback for _id
+                _id: onlineFriend._id, // Using email as a fallback for _id
                 name: onlineFriend.name,
                 email: onlineFriend.email
               })}
@@ -125,7 +128,7 @@ const FriendList: React.FC = () => {
               key={`offline-${i}`} 
               className='bg-[rgb(26,26,26)] w-full h-15 rounded-xl flex items-center p-2 mb-2 opacity-60'
               onClick={() => navigateToUser({
-                _id: friend.email, // Using email as a fallback for _id
+                _id: friend._id, // Using email as a fallback for _id
                 name: friend.name,
                 email: friend.email
               })}
