@@ -169,9 +169,9 @@ export default function Page() {
         
         {messages.map((message, i) => {
           const chatPosition = message.senderId === user?._id ? "end" : "start";
-          const chatType = message.senderId === user?._id ? "primary" : "accent";
+          const chatType = message.senderId === user?._id ? "primary" : "";
           return (
-            <div key={message._id || `message-${i}`} className={`chat chat-${chatPosition && chatPosition} text-white`}>
+            <div key={message._id || `message-${i}`} className={`chat chat-${chatPosition} text-white`}>
               <div className="chat-header flex flex-row items-center">
                 <p className='text-sm'>{message?.senderName}</p>
                 <time className="text-xs opacity-50 ml-2">
@@ -180,7 +180,7 @@ export default function Page() {
                     : 'N/A'}
                 </time>
               </div>
-              <div className={`chat-bubble chat-bubble-${chatType && chatType}`}>
+              <div className={`chat-bubble chat-bubble-${chatType}`}>
                 {message.message}
               </div>
             </div>

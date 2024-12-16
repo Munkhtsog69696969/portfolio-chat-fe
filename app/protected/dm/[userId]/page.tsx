@@ -171,7 +171,7 @@ export default function Page() {
         
         {messages.map((message, i) => {
           const chatPosition = message.senderId === user?._id ? "end" : "start";
-          const chatType = message.senderId === user?._id ? "primary" : "accent";
+          const chatType = message.senderId === user?._id ? "primary" : "";
           return (
             <div key={message._id || `message-${i}`} className={`chat chat-${chatPosition} text-white`}>
               <div className="chat-header flex flex-row items-center">
