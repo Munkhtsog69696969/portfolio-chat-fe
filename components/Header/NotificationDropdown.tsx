@@ -5,13 +5,10 @@ import { useUser } from '@/context/UserContext';
 import { useSocket } from '@/context/SocketContext';
 import { showSuccessToast } from '@/utils/toast';
 
-// interface newFriendRequest{
-//   getUserInfo:boolean
-// }
-
-interface Friend{
-  _id:string
-  name:string
+interface Friend {
+  _id: string;
+  name: string;
+  email: string;
 }
 
 const NotificationDropdown: React.FC = () => {
@@ -23,16 +20,13 @@ const NotificationDropdown: React.FC = () => {
 
     // Listen for incoming friend requests
     socket.on("receive-friend-request", () => {
-      // console.log("New friend request received:", newFriendRequest);
       fetchUser(); // Fetch updated user info
-
-     showSuccessToast("Someone sent you a friend request! Check your notification")
+      showSuccessToast("Someone sent you a friend request! Check your notification");
     });
 
     socket.on("receive-add-to-server", () => {
       fetchUser(); // Fetch updated user info
-
-     showSuccessToast("Someone added you to server")
+      showSuccessToast("Someone added you to server");
     });
 
     return () => {
@@ -46,16 +40,20 @@ const NotificationDropdown: React.FC = () => {
       label: (
         <div className="flex items-center justify-between gap-2 p-2">
           <div className="flex items-center gap-2">
-            <img src={"/avatar.png"} alt={friend.name} className="w-10 h-10 rounded-full" />
+            <img src={"/avatar.png"} alt={friend.name || 'User'} className="w-10 h-10 rounded-full" />
             <div>
-              <div>{friend.name}</div>
+              <div>{friend.name || 'Unnamed User'}</div>
               <div className="text-gray-500">{friend.email}</div>
             </div>
           </div>
           <Button
             type="primary"
             size="small"
-            onClick={() => handleAccept(friend)}
+            onClick={() => handleAccept({
+              _id: friend._id,
+              name: friend.name || 'Unnamed User',
+              email: friend.email
+            })}
           >
             Accept
           </Button>
@@ -63,17 +61,6 @@ const NotificationDropdown: React.FC = () => {
       ),
     }));
   };
-
-  // const createNoItems = () => {
-  //   return {
-  //     key: 'no-content',
-  //     label: (
-  //       <div className="flex items-center justify-center p-4 text-gray-500">
-  //         No content
-  //       </div>
-  //     ),
-  //   };
-  // };
 
   const handleAccept = async (friend: Friend) => {
     try {
@@ -86,7 +73,7 @@ const NotificationDropdown: React.FC = () => {
   };
 
   const items = createMenuItems();
-  const showItems = items
+  const showItems = items;
 
   return (
     <Dropdown 

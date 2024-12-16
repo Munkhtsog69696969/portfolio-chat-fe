@@ -1,4 +1,3 @@
-// FriendList.tsx
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -6,19 +5,19 @@ import { useRouter } from 'next/navigation';
 import { useUser } from '@/context/UserContext';
 import { useSocket } from '@/context/SocketContext';
 
-
 interface Friend {
   name: string;
   email: string;
 }
 
-interface User{
-  _id:string
-  name:string
+interface User {
+  _id: string;
+  name: string;
+  email: string;
 }
 
 const FriendList: React.FC = () => {
-  const router=useRouter()
+  const router = useRouter();
   const { user } = useUser();
   const socket = useSocket();
 
@@ -31,45 +30,47 @@ const FriendList: React.FC = () => {
     socket.emit("set-user", user);
 
     socket.on('show-user-friends-online', (friends: Friend[]) => {
-    //   console.log('Online friends:', friends);
       setOnlineFriends(friends);
       
       if (user.friends) {
-        const currentOfflineFriends = user.friends.filter(
-          friend => !friends.some(onlineFriend => onlineFriend.email === friend.email)
-        );
+        const currentOfflineFriends = user.friends
+          .filter(friend => 
+            // Ensure friend has a name and is not in online friends
+            friend.name && !friends.some(onlineFriend => onlineFriend.email === friend.email)
+          )
+          .map(friend => ({
+            name: friend.name!, // Use non-null assertion since we filtered for name
+            email: friend.email
+          }));
+
         setOfflineFriends(currentOfflineFriends);
       }
     });
 
     socket.on('friend-online', (friendData: Friend) => {
-        // console.log('Friend came online:', friendData);
-        
-        setOnlineFriends(prev => {
-          const isAlreadyOnline = prev.some(f => f.email === friendData.email);
-          return isAlreadyOnline 
-            ? prev 
-            : [...prev, friendData];
-        });
-      
-        setOfflineFriends(prev => 
-          prev.filter(friend => friend.email !== friendData.email)
-        );
+      setOnlineFriends(prev => {
+        const isAlreadyOnline = prev.some(f => f.email === friendData.email);
+        return isAlreadyOnline 
+          ? prev 
+          : [...prev, friendData];
+      });
+    
+      setOfflineFriends(prev => 
+        prev.filter(friend => friend.email !== friendData.email)
+      );
     });
 
     socket.on('friend-offline', (friendData: Friend) => {
-        console.log('Friend went offline:', friendData);
-        
-        setOnlineFriends(prev => 
-          prev.filter(f => f.email !== friendData.email)
-        );
-      
-        setOfflineFriends(prev => {
-          const isAlreadyOffline = prev.some(f => f.email === friendData.email);
-          return isAlreadyOffline 
-            ? prev 
-            : [...prev, friendData];
-        });
+      setOnlineFriends(prev => 
+        prev.filter(f => f.email !== friendData.email)
+      );
+    
+      setOfflineFriends(prev => {
+        const isAlreadyOffline = prev.some(f => f.email === friendData.email);
+        return isAlreadyOffline 
+          ? prev 
+          : [...prev, friendData];
+      });
     });
 
     return () => {
@@ -79,10 +80,9 @@ const FriendList: React.FC = () => {
     };
   }, [socket, user]);
 
-  const navigateToUser=(user:User)=>{
-    // console.log(user)
-    router.push(`/protected/dm/${user._id}`)
-  }
+  const navigateToUser = (friend: User) => {
+    router.push(`/protected/dm/${friend._id}`);
+  };
 
   return (
     <div className='flex flex-col w-full gap-y-4'>
@@ -94,7 +94,11 @@ const FriendList: React.FC = () => {
             <div 
               key={`online-${i}`} 
               className='bg-[rgb(26,26,26)] w-full h-15 rounded-xl flex items-center p-2 mb-2'
-              onClick={()=>navigateToUser(onlineFriend)}
+              onClick={() => navigateToUser({
+                _id: onlineFriend.email, // Using email as a fallback for _id
+                name: onlineFriend.name,
+                email: onlineFriend.email
+              })}
             >
               <Image 
                 src={'/avatar.png'}
@@ -120,7 +124,11 @@ const FriendList: React.FC = () => {
             <div 
               key={`offline-${i}`} 
               className='bg-[rgb(26,26,26)] w-full h-15 rounded-xl flex items-center p-2 mb-2 opacity-60'
-              onClick={()=>navigateToUser(friend)}
+              onClick={() => navigateToUser({
+                _id: friend.email, // Using email as a fallback for _id
+                name: friend.name,
+                email: friend.email
+              })}
             >
               <Image 
                 src={'/avatar.png'}

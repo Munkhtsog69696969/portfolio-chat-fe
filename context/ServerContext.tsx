@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
 import { showErrorToast, showSuccessToast } from '@/utils/toast';
 import axios from 'axios';
 import { useAuth } from './AuthContext';
@@ -8,6 +8,10 @@ import { useAuth } from './AuthContext';
 interface Server {
   _id: string;
   server_name: string;
+  owners: { name: string; email: string }[];
+  members: { name: string; email: string }[];
+  messages: string[];
+  createdAt: string;
 }
 
 interface UpdateServerParams{
@@ -17,7 +21,7 @@ interface UpdateServerParams{
 
 
 interface ServerContextType {
-  servers: Server[] | null;
+  // servers: Server[] | null;
   createServer: (serverData: Partial<Server>) => Promise<void>;
   getServerInfo: (serverId: string) => Promise<Server | null>;
   addPeopleToServer: (params: UpdateServerParams) => Promise<Server | null>;

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import axios, { AxiosInstance } from 'axios';
+import axios from 'axios';
 import { useAuth } from './AuthContext';
 
 import { showErrorToast, showSuccessToast } from '@/utils/toast';
@@ -35,7 +35,6 @@ interface Result {
 
 interface UserContextType {
   user: User | null;
-  setUser
   fetchUser: () => Promise<User[] | null>;
   searchPeople: (searchName: string) => Promise<Result[] | null>;
   sendFriendRequest :(recieverId:string)=> Promise<void>;
@@ -164,13 +163,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const acceptFriendRequest = async (id:any) => {
+  const acceptFriendRequest = async (id: string): Promise<void> => { // Explicitly return void
     try {
       const currentToken = accessToken || (await refreshAccessToken());
   
       if (!currentToken) {
-        console.log('No valid access token available');
-        return null;
+        showErrorToast('No valid access token available');
+        return; // Return void instead of null
       }
   
       const axiosInstance = axios.create({
@@ -179,17 +178,18 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           Authorization: `Bearer ${currentToken}`
         }
       });
-      console.log("accepd id",id)
 
       const response = await axiosInstance.post(`/accept_friend_request/${id}`);
 
-      fetchUser()
+      await fetchUser() // Use await to ensure it completes
 
       showSuccessToast(response.data.message)
 
     } catch (err: any) {
-      console.log("Error fetching people:", err.response?.data || err.message);
-      return null;
+      console.log("Error accepting friend request:", err.response?.data || err.message);
+      showErrorToast(err.response?.data.message || 'Failed to accept friend request');
+      // Explicitly return void
+      return;
     }
   };
 
@@ -199,7 +199,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const contextValue = {
     user,
-    setUser,
     fetchUser,
     searchPeople,
     sendFriendRequest,

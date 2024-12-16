@@ -1,19 +1,19 @@
 // Header.tsx
 'use client';
 import React, { useState } from 'react';
-import { useUser } from '@/context/UserContext';
+// import { useUser } from '@/context/UserContext';
 import { FaSearch, FaUsers } from 'react-icons/fa';
 import { MdOutlineSettings } from "react-icons/md";
 import { IoPersonAddSharp } from "react-icons/io5";
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
-import DrawerProfile from './DrawerProfile';
+// import DrawerProfile from './DrawerProfile';
 import ModalFindPeople from './Header/ModalFindPeople';
 import NotificationDropdown from './Header/NotificationDropdown';
 import ModalServerInfo from './Header/ModalServerInfo';
 
 export default function Header() {
-  const { user } = useUser();
+  // const { user } = useUser();
   const [isModalFindPeopleOpen, setModalFindPeopleOpen] = useState(false);
   const [isModalServerInfoOpen,setModalServerInfoOpen]=useState(false)
 
@@ -29,7 +29,7 @@ export default function Header() {
 
   return (
     <div className='bg-black py-2 flex flex-row items-center justify-between px-4 relative'>
-      <DrawerProfile user={user} />
+      {/* <DrawerProfile user={user} /> */}
 
       {
         serverId && (

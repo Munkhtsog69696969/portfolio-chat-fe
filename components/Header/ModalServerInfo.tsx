@@ -3,7 +3,7 @@
 import { useServer } from '@/context/ServerContext';
 import { useUser } from '@/context/UserContext';
 import { useParams } from 'next/navigation';
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { Empty } from 'antd';
 import { FaSearch, FaUserFriends, FaPlus, FaArrowRight } from 'react-icons/fa';
@@ -16,12 +16,11 @@ interface ModalServerInfoProps {
 
 interface Server {
   server_name: string;
-  owners: { name: string; email: string }[];
-  members: { name: string; email: string }[];
+  owners: { name: string; email: string; _id?: string }[];
+  members: { name: string; email: string; _id?: string }[];
   messages: string[];
   createdAt: string; // ISO string
 }
-
 interface Result {
   _id: string;
   email: string;
@@ -34,8 +33,8 @@ interface Result {
 }
 
 const ModalServerInfo: React.FC<ModalServerInfoProps> = ({ isOpen, onClose }) => {
-  const socket=useSocket()
-  const {user}=useUser()
+  const socket = useSocket()
+  const { user } = useUser()
   const { getServerInfo, addPeopleToServer, promoteToAdmin, kickUser } = useServer();
   const { searchPeople, sendFriendRequest } = useUser();
   const { serverId } = useParams();
@@ -44,7 +43,7 @@ const ModalServerInfo: React.FC<ModalServerInfoProps> = ({ isOpen, onClose }) =>
   const [activeTab, setActiveTab] = useState('server');
   const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState<Result[]>([]);
-  const [isOwner, setIsOwner]=useState(false)
+  const [isOwner, setIsOwner] = useState(false)
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -52,7 +51,9 @@ const ModalServerInfo: React.FC<ModalServerInfoProps> = ({ isOpen, onClose }) =>
       setIsLoading(true);
       const fetchServerInfo = async () => {
         try {
-          const serverInfo = await getServerInfo(serverId);
+          // Convert serverId to string if it's an array
+          const serverIdString = Array.isArray(serverId) ? serverId[0] : serverId;
+          const serverInfo = await getServerInfo(serverIdString);
           setServer(serverInfo);
         } catch (err) {
           console.error(err);
@@ -63,23 +64,24 @@ const ModalServerInfo: React.FC<ModalServerInfoProps> = ({ isOpen, onClose }) =>
 
       fetchServerInfo();
     }
-  }, [serverId]);
-
-  useEffect(()=>{
-    const owner = server?.owners?.some(owner => owner.email === user?.email);
-    setIsOwner(owner)
-  },[server])
+  }, [serverId, getServerInfo]);
 
   useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-        onClose();
-      }
-    };
+    const owner = server?.owners?.some(owner => owner.email === user?.email) ?? false;
+    setIsOwner(owner)
+  }, [server, user]);
 
+  // Use useCallback to memoize the handleOutsideClick function
+  const handleOutsideClick = useCallback((event: MouseEvent) => {
+    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+      onClose();
+    }
+  }, [onClose]);
+
+  useEffect(() => {
     document.addEventListener('mousedown', handleOutsideClick);
     return () => document.removeEventListener('mousedown', handleOutsideClick);
-  }, [onClose]);
+  }, [handleOutsideClick]);
 
   const handleInputChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -119,45 +121,48 @@ const ModalServerInfo: React.FC<ModalServerInfoProps> = ({ isOpen, onClose }) =>
     }
   };
 
-  const addToServer=async(userId:string)=>{
-    try{
-        if(socket && userId){
-            if(serverId){
-                const updatedServer=await addPeopleToServer({serverId:serverId,userId:userId})
-    
-                socket.emit("add-people-to-server",{
-                    toUserId:userId
-                })
-    
-                setServer(updatedServer)
-            }
+  const addToServer = async (userId: string) => {
+    try {
+      if(socket && userId){
+        if (serverId) {
+          const serverIdString = Array.isArray(serverId) ? serverId[0] : serverId;
+          const updatedServer = await addPeopleToServer({serverId: serverIdString, userId: userId})
+  
+          socket.emit("add-people-to-server", {
+            toUserId: userId
+          })
+  
+          setServer(updatedServer)
         }
-    }catch(err){
-        console.log(err)
+      }
+    } catch(err) {
+      console.log(err)
     }
   }
 
-  const promoteUserToAdmin=async(userId:string)=>{
-    try{
-        if(serverId){
-            const updatedServer=await promoteToAdmin({serverId:serverId, userId:userId})
+  const promoteUserToAdmin = async (userId: string) => {
+    try {
+      if (serverId) {
+        const serverIdString = Array.isArray(serverId) ? serverId[0] : serverId;
+        const updatedServer = await promoteToAdmin({serverId: serverIdString, userId: userId})
 
-            setServer(updatedServer)
-        }
-    }catch(err){
-        console.log(err)
+        setServer(updatedServer)
+      }
+    } catch(err) {
+      console.log(err)
     }
   }
 
-  const kickUserFromServer=async(userId:string)=>{
-    try{
-        if(serverId){
-            const updatedServer=await kickUser({serverId:serverId, userId:userId})
+  const kickUserFromServer = async (userId: string) => {
+    try {
+      if (serverId) {
+        const serverIdString = Array.isArray(serverId) ? serverId[0] : serverId;
+        const updatedServer = await kickUser({serverId: serverIdString, userId: userId})
 
-            setServer(updatedServer)
-        }
-    }catch(err){
-        console.log(err)
+        setServer(updatedServer)
+      }
+    } catch(err) {
+      console.log(err)
     }
   }
 
@@ -256,14 +261,31 @@ const ModalServerInfo: React.FC<ModalServerInfoProps> = ({ isOpen, onClose }) =>
                         isOwner ?
                             <div className='flex flex-row absolute right-5 gap-2'>
                                 <div>
-                                    <button className='bg-green-500 p-2 rounded' onClick={()=>promoteUserToAdmin(member?._id)}>
-                                        Promote to Admin
-                                    </button>
+                                  <button 
+                                    className='bg-green-500 p-2 rounded' 
+                                    onClick={() => {
+                                      // Find the user's ID from another source or modify your data structure
+                                      const userId = server?.members.find(m => m.email === member.email)?._id;
+                                      if (userId) {
+                                        promoteUserToAdmin(userId);
+                                      }
+                                    }}
+                                  >
+                                    Promote to Admin
+                                  </button>
                                 </div>
                                 <div>
-                                    <button className='bg-red-500 p-2 rounded' onClick={()=>kickUserFromServer(member?._id)}>
-                                        Kick user
-                                    </button>
+                                  <button 
+                                    className='bg-red-500 p-2 rounded' 
+                                    onClick={() => {
+                                      const userId = server?.members.find(m => m.email === member.email)?._id;
+                                      if (userId) {
+                                        kickUserFromServer(userId);
+                                      }
+                                    }}
+                                  >
+                                    Kick user
+                                  </button>
                                 </div>
                             </div>
                         :
