@@ -36,7 +36,7 @@ const ServerList: React.FC<{ onOpenModal: () => void }> = ({ onOpenModal }) => {
         return (
           <div key={i} className="tooltip tooltip-right tooltip-custom" data-tip={server?.server_name}>
             <button className='btn btn rounded-full flex justify-center items-center bg-[rgb(48,48,48)] w-14 h-14'
-                onClick={()=>router.push(`/protected/server/${server.id}`)}
+                onClick={()=>router.push(`/protected/server/${server._id}`)}
             >
               <p className='text-white'>{shortName}</p>
             </button>

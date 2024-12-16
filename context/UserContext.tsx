@@ -16,7 +16,7 @@ interface User {
 }
 
 interface Server {
-    id:string,
+    _id:string,
     server_name:string,
     owners:User[],
     members:User[],
